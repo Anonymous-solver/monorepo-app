@@ -33,4 +33,9 @@ EXPOSE 3000
 CMD ["node", "server/server.js"]
 
 
+# docker build -t monorepo-app .
+# docker run -d -p 5000:5000 --name monorepo-app monorepo-app
+
+
+
 

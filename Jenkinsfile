@@ -2,14 +2,15 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub-creds')
-        DOCKERHUB_REPO = 'your-dockerhub-username/monorepo-app'
+        // DOCKERHUB_CREDENTIALS = credentials('dockerhub-creds')
+        // DOCKERHUB_REPO = 'your-dockerhub-username/monorepo-app'
+        DOCKER_IMAGE = "anikb29/monorepo-app"
     }
 
     stages {
         stage('Checkout') {
             steps {
-                checkout scm
+                git branch: 'main', url: 'https://github.com/Anonymous-solver/monorepo-app.git'
             }
         }
 
@@ -22,21 +23,25 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $DOCKERHUB_REPO:latest .'
+                sh "docker build -t ${DOCKER_IMAGE}:latest ."
             }
         }
 
         stage('Push Docker Image') {
             steps {
-                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
-                sh 'docker push $DOCKERHUB_REPO:latest'
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh '''
+                        echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                        docker push ${DOCKER_IMAGE}:latest
+                    '''
+                }
             }
         }
 
         stage('Deploy') {
             steps {
                 sh 'docker stop monorepo-app || true && docker rm monorepo-app || true'
-                sh 'docker run -d --name monorepo-app -p 5000:5000 $DOCKERHUB_REPO:latest'
+                sh "docker run -d --name monorepo-app -p 3000:3000 ${DOCKER_IMAGE}:latest"
             }
         }
     }
