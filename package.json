@@ -1,0 +1,28 @@
+{
+  "name": "monorepo-app",
+  "private": true,
+  "scripts": {
+    "prestart": "cd client && react-scripts build",
+    "start": "cross-env NODE_ENV=development node server/server.js",
+    "test": "jest --passWithNoTests",
+    "sonar": "sonar-scanner"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-scripts": "5.0.1"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.28.3",
+    "@babel/preset-react": "^7.27.1",
+    "@testing-library/jest-dom": "^6.8.0",
+    "@testing-library/react": "^16.3.0",
+    "babel-jest": "^29.7.0",
+    "cross-env": "^7.0.3",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^30.1.2",
+    "sonarqube-scanner": "^3.1.0",
+    "supertest": "^6.3.4"
+  }
+}
