@@ -34,7 +34,7 @@ CMD ["node", "server/server.js"]
 
 
 # docker build -t monorepo-app .
-# docker run -d -p 5000:5000 --name monorepo-app monorepo-app
+# docker run -d -p 3000:3000 --name monorepo-app monorepo-app
 
 
 
