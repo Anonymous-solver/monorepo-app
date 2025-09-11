@@ -2,7 +2,6 @@
   "name": "monorepo-app",
   "private": true,
   "scripts": {
-    "prestart": "cd client && react-scripts build",
     "start": "cross-env NODE_ENV=development node server/server.js",
     "test": "jest --passWithNoTests",
     "sonar": "sonar-scanner"
@@ -16,6 +15,7 @@
   "devDependencies": {
     "@babel/preset-env": "^7.28.3",
     "@babel/preset-react": "^7.27.1",
+    "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.8.0",
     "@testing-library/react": "^16.3.0",
     "babel-jest": "^29.7.0",
