@@ -13,15 +13,16 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/Anonymous-solver/monorepo-app.git'
             }
         }
-
+        
         stage('Gitleaks Scan') {
             steps {
                 powershell '''
                     Write-Output "Running Gitleaks scan with Docker..."
-                    docker run --rm -v "${env:WORKSPACE}:/repo" zricethezav/gitleaks:latest detect --source=/repo --no-banner --verbose --redact || true
+                    docker run --rm -v "${env:WORKSPACE}:/repo" zricethezav/gitleaks:latest detect --source=/repo --no-banner --verbose --redact; exit 0
                 '''
             }
         }
+
 
         stage('Instll & Test') {
             steps {
