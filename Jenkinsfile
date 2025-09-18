@@ -41,7 +41,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 sh 'docker stop monorepo-app || true && docker rm monorepo-app || true'
-                sh "docker run -d --name monorepo-app -p 3000:3000 ${DOCKER_IMAGE}:latest"
+                sh "docker run -d --name monorepo-app -p 4000:4000 ${DOCKER_IMAGE}:latest"
             }
         }
     }
