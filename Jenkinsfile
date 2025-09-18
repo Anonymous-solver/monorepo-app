@@ -18,10 +18,11 @@ pipeline {
             steps {
                 sh '''
                     echo "Running Gitleaks scan with Docker..."
-                    docker run --rm -v $(pwd):/path zricethezav/gitleaks:latest detect --source=/path --no-banner --verbose --redact
+                    docker run --rm -v "$WORKSPACE:/repo" zricethezav/gitleaks:latest detect --source=/repo --no-banner --verbose --redact
                 '''
             }
         }
+
 
         stage('Instll & Test') {
             steps {
