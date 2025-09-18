@@ -18,7 +18,7 @@ pipeline {
             steps {
                 powershell '''
                     Write-Output "Running Gitleaks scan with Docker..."
-                    docker run --rm -v "${env:WORKSPACE}:C:/repo" zricethezav/gitleaks:latest detect --source=/repo --no-banner --verbose --redact
+                    docker run --rm -v "${env:WORKSPACE}:/repo" zricethezav/gitleaks:latest detect --source=/repo --no-banner --verbose --redact
                 '''
             }
         }
