@@ -36,6 +36,9 @@ CMD ["node", "server/server.js"]
 # docker build -t monorepo-app .
 # docker run -d -p 3000:3000 --name monorepo-app monorepo-app
 
+# devsec tools to consider adding:
+# trivy, dependancy track, cyclonedx-bom, DAST(OWASP ZAP), Zaproxy
+
 
 
 
