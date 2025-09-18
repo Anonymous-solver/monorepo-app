@@ -14,7 +14,18 @@ pipeline {
             }
         }
 
-        stage('Install & Test') {
+        stage('Gitleaks Scan') {
+            steps {
+                sh '''
+                    echo "Running Gitleaks secret scan..."
+                    curl -sSL https://github.com/gitleaks/gitleaks/releases/latest/download/gitleaks-linux-amd64 -o gitleaks
+                    chmod +x gitleaks
+                    ./gitleaks detect --source . --no-banner --verbose --redact
+                '''
+            }
+        }
+
+        stage('Instll & Test') {
             steps {
                 sh 'yarn install'
                 sh 'yarn test'
