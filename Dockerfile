@@ -29,7 +29,7 @@ COPY --from=deps /app/server ./server
 # Copy client build into final image
 COPY --from=client-build /app/client/build ./client/build
 
-EXPOSE 3000
+EXPOSE 4000
 CMD ["node", "server/server.js"]
 
 
