@@ -16,12 +16,9 @@ pipeline {
 
         stage('Gitleaks Scan') {
             steps {
-                sh '''
-                    echo "Running Gitleaks secret scan..."
-                    curl -sSL https://github.com/gitleaks/gitleaks/releases/latest/download/gitleaks-linux-amd64 -o gitleaks
-                    chmod +x gitleaks
-                    ./gitleaks version
-                    ./gitleaks detect --source . --no-banner --verbose --redact
+                powershell '''
+                    Write-Output "Running Gitleaks scan with Docker..."
+                    docker run --rm -v "${env:WORKSPACE}:C:/repo" zricethezav/gitleaks:latest detect --source=/repo --no-banner --verbose --redact
                 '''
             }
         }
