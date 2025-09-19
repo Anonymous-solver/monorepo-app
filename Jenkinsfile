@@ -33,19 +33,20 @@ pipeline {
                 withCredentials([string(credentialsId: 'dtrack-api-key', variable: 'DT_API_KEY')]) {
                     powershell '''
                         Write-Output "Generating SBOM inside Node container..."
-                        docker run --rm -v "${env:WORKSPACE}:/app" -w /app node:18-alpine \
+                        docker run --rm -v "${env:WORKSPACE}:/app" -w /app node:18-alpine `
                         sh -c "npm install -g @cyclonedx/bom && npx @cyclonedx/bom -o bom.json"
 
                         Write-Output "Uploading SBOM to Dependency-Track..."
                         curl -X POST `
                             -H "X-Api-Key: $env:DT_API_KEY" `
                             -H "Content-Type: application/json" `
-                            --data @bom.json `
+                            --data-binary (Get-Content -Raw "$env:WORKSPACE\\bom.json") `
                             http://localhost:9091/api/v1/bom
                     '''
                 }
             }
         }
+
 
 
         stage('Build Docker Image') {
