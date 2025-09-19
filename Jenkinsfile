@@ -28,19 +28,19 @@ pipeline {
             }
         }
 
-        stage('Dependency Track Upload') {
-            agent {
-                docker {
-                    image 'node:18-alpine'
-                    args '-v /var/run/docker.sock:/var/run/docker.sock'
-                }
+        stage('Generate SBOM') {
+            steps {
+                sh '''
+                    echo "Generating SBOM..."
+                    npx @cyclonedx/bom@latest -o bom.json
+                '''
             }
+        }
+
+        stage('Upload SBOM to Dependency-Track') {
             steps {
                 withCredentials([string(credentialsId: 'dtrack-api-key', variable: 'DT_API_KEY')]) {
                     sh '''
-                        echo "Generating SBOM..."
-                        npx @cyclonedx/bom@latest -o bom.json
-
                         echo "Uploading SBOM to Dependency-Track..."
                         curl -X POST \
                             -H "X-Api-Key: $DT_API_KEY" \
@@ -51,6 +51,7 @@ pipeline {
                 }
             }
         }
+    
 
         stage('Build Docker Image') {
             steps {
