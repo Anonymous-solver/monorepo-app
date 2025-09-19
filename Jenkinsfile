@@ -31,17 +31,21 @@ pipeline {
         stage('Dependency Track Upload') {
             steps {
                 withCredentials([string(credentialsId: 'dtrack-api-key', variable: 'DT_API_KEY')]) {
-                    powershell '''
-                        Write-Output "Generating SBOM on host..."
-                        npx @cyclonedx/bom@latest -o "$env:WORKSPACE\\bom.json"
-
-                        Write-Output "Uploading SBOM to Dependency-Track..."
-                        curl.exe -X POST `
-                            -H "X-Api-Key: $env:DT_API_KEY" `
-                            -H "Content-Type: application/json" `
-                            --data-binary "@$env:WORKSPACE\\bom.json" `
-                            http://localhost:9091/api/v1/bom
-                    '''
+                    nodejs(nodeJSInstallationName: 'Node16') { // Replace 'Node16' with your configured Node.js installation name
+                        powershell '''
+                            Write-Output "Checking Node.js and npm versions..."
+                            node --version
+                            npm --version
+                            Write-Output "Generating SBOM on host..."
+                            npx @cyclonedx/bom@latest -o "$env:WORKSPACE\\bom.json"
+                            Write-Output "Uploading SBOM to Dependency-Track..."
+                            curl.exe -X POST `
+                                -H "X-Api-Key: $env:DT_API_KEY" `
+                                -H "Content-Type: application/json" `
+                                --data-binary "@$env:WORKSPACE\\bom.json" `
+                                http://localhost:9091/api/v1/bom
+                        '''
+                    }
                 }
             }
         }
