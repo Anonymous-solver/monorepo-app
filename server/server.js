@@ -13,7 +13,7 @@ app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "../client/build", "index.html"));
 });
 
-CF_ACCESS_CLIENT_SECRET=f6b4480418755f91ed709f51f94722066fa28645389582a990041c85b544b659
+// CF_ACCESS_CLIENT_SECRET=f6b4480418755f91ed709f51f94722066fa28645389582a990041c85b544b659
 
 // app.use(express.static(path.join(__dirname, "public")));
 // app.get("*", (req, res) => {

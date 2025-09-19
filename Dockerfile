@@ -39,6 +39,16 @@ CMD ["node", "server/server.js"]
 # devsec tools to consider adding:
 # trivy, dependancy track, cyclonedx-bom, DAST(OWASP ZAP), Zaproxy
 
+# improvements: 1. don't need to run yarn install and yarn test twice. we can do it from docker image
+# 2. git leaks report should be saved in another git branch
 
+#sonarqube: admin/admin123
 
+# docker run -d --name dtrack-apiserver -p 9091:8080 dependencytrack/apiserver
+# docker run -d --name dtrack-frontend -p 9090:8080 \
+#     -e API_BASE_URL=http://localhost:9091 \
+#     dependencytrack/frontend
+
+# dependency track: admin/admin123
+# odt_38HoeGNC_kBW1QIa8Oxv7GmiQVByPGUgalQYUgMJA
 
