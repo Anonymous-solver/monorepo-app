@@ -30,7 +30,7 @@ pipeline {
 
         stage('Dependency Track Upload') {
             steps {
-                withCredentials([string(credentialsId: 'dependency-track-api-key', variable: 'DT_API_KEY')]) {
+                withCredentials([string(credentialsId: 'dtrack-api-key', variable: 'DT_API_KEY')]) {
                     sh '''
                         echo "Generating SBOM..."
                         npx @cyclonedx/bom@latest -o bom.json
@@ -40,11 +40,12 @@ pipeline {
                             -H "X-Api-Key: $DT_API_KEY" \
                             -H "Content-Type: application/json" \
                             --data @bom.json \
-                            https://your-dependency-track-server/api/v1/bom
+                            http://localhost:9091/api/v1/bom
                     '''
                 }
             }
         }
+
 
         stage('Build Docker Image') {
             steps {
