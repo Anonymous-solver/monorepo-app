@@ -29,19 +29,16 @@ pipeline {
         }
 
         stage('Generate SBOM') {
-            try {
-                powershell """
-                    Write-Output 'Generating SBOM with CycloneDX...'
-                    docker run --rm cyclonedx/cyclonedx-cli:latest \
-                        -o bom.json
-                    Write-Output 'SBOM generated successfully!'
-                """
-            } catch (err) {
-                echo "Error: ${err}"
-                currentBuild.result = 'FAILURE'
+            steps {
+                catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
+                    powershell """
+                        Write-Output 'Generating SBOM with CycloneDX...'
+                        docker run --rm cyclonedx/cyclonedx-cli:latest -o bom.json
+                        Write-Output 'SBOM generated successfully!'
+                    """
+                }
             }
         }
-
 
         stage('Build Docker Image') {
             steps {
