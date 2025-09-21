@@ -39,7 +39,7 @@ pipeline {
                                             projectVersion: '1.0.0',
                                             autoCreateProjects: true,
                                             dependencyTrackApiKey: DT_API_KEY,
-                                            dependencyTrackUrl: 'http://localhost:9090/',
+                                            dependencyTrackUrl: 'http://localhost:9091/',
                                             synchronous: true
                 }
             }
