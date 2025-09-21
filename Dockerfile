@@ -50,5 +50,4 @@ CMD ["node", "server/server.js"]
 #     dependencytrack/frontend
 
 # dependency track: admin/admin123
-# odt_38HoeGNC_kBW1QIa8Oxv7GmiQVByPGUgalQYUgMJA
-
+# odt_BTXnA3yB_hOoJRww5nZzu09W3UtrItaNc3uQTyRbb

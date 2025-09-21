@@ -28,6 +28,20 @@ pipeline {
             }
         }
 
+        stage('Publish SBOM (plugin)') {
+            steps {
+                withCredentials([string(credentialsId: 'dtrack-api-key', variable: 'DT_API_KEY')]) {
+                sh 'npx @cyclonedx/cyclonedx-npm -o bom.json'
+                // plugin step (no sh)
+                dependencyTrackPublisher artifact: 'bom.json',
+                                        projectName: 'monorepo-app',
+                                        autoCreateProjects: true,
+                                        dependencyTrackApiKey: "${DT_API_KEY}",
+                                        dependencyTrackUrl: 'http://localhost:9090/'
+                }
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 sh "docker build -t ${DOCKER_IMAGE}:latest ."
