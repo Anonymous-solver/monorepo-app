@@ -31,13 +31,14 @@ pipeline {
         stage('Publish SBOM (plugin)') {
             steps {
                 withCredentials([string(credentialsId: 'dtrack-api-key', variable: 'DT_API_KEY')]) {
-                sh 'npx @cyclonedx/cyclonedx-npm -o bom.json'
-                // plugin step (no sh)
-                dependencyTrackPublisher artifact: 'bom.json',
-                                        projectName: 'monorepo-app',
-                                        autoCreateProjects: true,
-                                        dependencyTrackApiKey: "${DT_API_KEY}",
-                                        dependencyTrackUrl: 'http://localhost:9090/'
+                    sh 'npx @cyclonedx/cyclonedx-npm -o bom.json'
+                    dependencyTrackPublisher artifact: 'bom.json',
+                                            projectName: 'monorepo-app',
+                                            projectVersion: '1.0.0', // optional but recommended
+                                            autoCreateProjects: true,
+                                            dependencyTrackApiKey: "${DT_API_KEY}",
+                                            dependencyTrackUrl: 'http://localhost:9090/',
+                                            synchronous: true
                 }
             }
         }
