@@ -31,9 +31,8 @@ pipeline {
         stage('Publish SBOM (plugin)') {
             steps {
                 withCredentials([string(credentialsId: 'dtrack-api-key', variable: 'DT_API_KEY')]) {
-                    // Generate SBOM (use one of the correct commands)
-                    sh 'npx @cyclonedx/cyclonedx-npm --output-format json > bom.json'
-                    // Or alternative: sh 'npx @cyclonedx/bom -o bom.json'
+                    // Generate SBOM (ignore npm errors)
+                    sh 'npx @cyclonedx/cyclonedx-npm --output-format json --ignore-npm-errors > bom.json'
 
                     dependencyTrackPublisher artifact: 'bom.json',
                                             projectName: 'monorepo-app',
