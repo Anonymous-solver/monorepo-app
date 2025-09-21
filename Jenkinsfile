@@ -60,7 +60,8 @@ pipeline {
                                             autoCreateProjects: true,
                                             dependencyTrackApiKey: DT_API_KEY,
                                             dependencyTrackUrl: 'http://localhost:9091/',
-                                            synchronous: true
+                                            synchronous: true,
+                                            timeout: 30000  // 30 second timeout
                 }
             }
         }
