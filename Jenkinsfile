@@ -48,24 +48,35 @@ pipeline {
             }
         }
 
-        stage('Publish SBOM (plugin)') {
+        stage('Publish SBOM (Direct API)') {
             steps {
                 withCredentials([string(credentialsId: 'dtrack-api-key', variable: 'DT_API_KEY')]) {
-                    // Generate SBOM (ignore npm errors)
-                    sh 'npx @cyclonedx/cyclonedx-npm --output-format json --ignore-npm-errors > bom.json'
-
-                    dependencyTrackPublisher artifact: 'bom.json',
-                                            projectName: 'monorepo-app',
-                                            projectVersion: '1.0.0',
-                                            autoCreateProjects: true,
-                                            dependencyTrackApiKey: DT_API_KEY,
-                                            dependencyTrackUrl: 'http://localhost:9091/',
-                                            synchronous: true,
-                                            timeout: 30000  // 30 second timeout
+                    sh '''
+                        # Generate SBOM
+                        npx @cyclonedx/cyclonedx-npm --output-format json --ignore-npm-errors > bom.json
+                        
+                        # Upload to Dependency-Track
+                        echo "Uploading SBOM to Dependency-Track..."
+                        curl -v -X "POST" "http://localhost:9091/api/v1/bom" \
+                            -H "Content-Type: multipart/form-data" \
+                            -H "X-Api-Key: $DT_API_KEY" \
+                            -F "projectName=monorepo-app" \
+                            -F "projectVersion=1.0.0" \
+                            -F "autoCreate=true" \
+                            -F "bom=@bom.json"
+                        
+                        # Check if successful
+                        if [ $? -eq 0 ]; then
+                            echo "✅ SBOM uploaded successfully to Dependency-Track"
+                        else
+                            echo "❌ Failed to upload SBOM"
+                            exit 1
+                        fi
+                    '''
                 }
             }
         }
-
+        
         stage('Build Docker Image') {
             steps {
                 sh "docker build -t ${DOCKER_IMAGE}:latest ."
