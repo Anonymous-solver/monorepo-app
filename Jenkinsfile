@@ -28,6 +28,26 @@ pipeline {
             }
         }
 
+        stage('Test Network Connectivity') {
+            steps {
+                sh '''
+                    echo "Testing connectivity to Dependency-Track server..."
+                    echo "Trying 172.17.0.1:9091"
+                    curl -v http://172.17.0.1:9091/api/version || echo "Connection to 172.17.0.1 failed"
+                    
+                    echo "Trying host.docker.internal:9091"
+                    curl -v http://host.docker.internal:9091/api/version || echo "Connection to host.docker.internal failed"
+                    
+                    echo "Trying localhost:9091 from agent"
+                    curl -v http://localhost:9091/api/version || echo "Connection to localhost from agent failed"
+                    
+                    # Check network interfaces
+                    echo "Network interfaces:"
+                    ifconfig || ip addr || echo "Network tools not available"
+                '''
+            }
+        }
+
         stage('Publish SBOM (plugin)') {
             steps {
                 withCredentials([string(credentialsId: 'dtrack-api-key', variable: 'DT_API_KEY')]) {
