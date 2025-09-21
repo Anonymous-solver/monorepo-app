@@ -28,16 +28,6 @@ pipeline {
             }
         }
 
-        stage('Generate SBOM') {
-            steps {
-                powershell """
-                    Write-Output 'Generating SBOM with CycloneDX...'
-                    docker run --rm -v "${env:WORKSPACE}:/app" -w /app cyclonedx/cyclonedx-cli:latest make --output-format json --output-file bom.json
-                    Write-Output 'SBOM generated successfully!'
-                """
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
                 sh "docker build -t ${DOCKER_IMAGE}:latest ."
