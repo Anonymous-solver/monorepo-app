@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DT_API_TOKEN = odt_W17FM3P5_r6feD519ruL9iX5BJZrdg5pWp2p8xgrv
-        DT_API_URL = localhost:9091
+        DT_API_URL = "http://localhost:9091"
         BUILD_NUMBER = 
         DOCKER_IMAGE = "anikb29/monorepo-app"
     }
