@@ -54,14 +54,14 @@ pipeline {
                         echo "🔎 Checking if project exists in Dependency-Track..."
                         PROJECT_EXISTS=$(curl -s -o /dev/null -w "%{http_code}" \
                         -H "X-Api-Key: ${DT_API_TOKEN}" \
-                        "${DT_API_URL}/api/v1/projects?name=monorepo-app&version=1.0.0")
+                        "http://localhost:9091/api/v1/projects?name=monorepo-app&version=1.0.0")
 
                         if [ "$PROJECT_EXISTS" -ne 200 ]; then
                         echo "⚡ Project not found. Creating project..."
                         curl -s -X PUT \
                             -H "X-Api-Key: ${DT_API_TOKEN}" \
                             -H "Content-Type: application/json" \
-                            ${DT_API_URL}/api/v1/projects \
+                            http://localhost:9091/api/v1/projects \
                             -d '{
                                 "name": "monorepo-app",
                                 "version": "1.0.0",
