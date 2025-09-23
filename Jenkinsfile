@@ -48,61 +48,18 @@ pipeline {
 
         stage('Upload SBOM to Dependency-Track') {
             steps {
-                script {
-                    // First: ensure project exists
-                    sh '''
-                        echo "🔎 Checking if project exists in Dependency-Track..."
-                        PROJECT_EXISTS=$(curl -s -o /dev/null -w "%{http_code}" \
-                        -H "X-Api-Key: ${DT_API_TOKEN}" \
-                        "http://localhost:9091/api/v1/projects?name=monorepo-app&version=1.0.0")
-
-                        if [ "$PROJECT_EXISTS" -ne 200 ]; then
-                        echo "⚡ Project not found. Creating project..."
-                        curl -s -X PUT \
-                            -H "X-Api-Key: ${DT_API_TOKEN}" \
-                            -H "Content-Type: application/json" \
-                            http://localhost:9091/api/v1/projects \
-                            -d '{
-                                "name": "monorepo-app",
-                                "version": "1.0.0",
-                                "classifier": "APPLICATION"
-                                }'
-                        echo "✅ Project created (monorepo-app v1.0.0)"
-                        else
-                        echo "✅ Project already exists in Dependency-Track"
-                        fi
-                    '''
-                }
-
-                // Then: upload SBOM
                 dependencyTrackPublisher(
                     artifact: 'sbom.json',
                     autoCreateProjects: true,
                     dependencyTrackApiKey: "${DT_API_TOKEN}",
                     dependencyTrackFrontendUrl: "${DT_API_URL}",
-                    dependencyTrackUrl: "http://localhost:9091/api/v1/projects",
+                    dependencyTrackUrl: "http://localhost:9091/api",
                     projectName: "monorepo-app",
-                    projectVersion: "1.0.0",
+                    projectVersion: "1.0.0",   // keep consistent with UI until confirmed
                     synchronous: true
                 )
             }
         }
-
- 
-        // stage('Upload SBOM to Dependency-Track') {
-        //     steps {
-        //         dependencyTrackPublisher(
-        //             artifact: 'sbom.json',
-        //             autoCreateProjects: true,
-        //             dependencyTrackApiKey: "${DT_API_TOKEN}",
-        //             dependencyTrackFrontendUrl: "${DT_API_URL}",
-        //             dependencyTrackUrl: "http://localhost:9091/api",
-        //             projectName: "monorepo-app",
-        //             projectVersion: "1.0.0",   // keep consistent with UI until confirmed
-        //             synchronous: true
-        //         )
-        //     }
-        // }
         
         stage('Build Docker Image') {
             steps {
