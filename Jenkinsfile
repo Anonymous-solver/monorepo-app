@@ -80,7 +80,7 @@ pipeline {
                     autoCreateProjects: true,
                     dependencyTrackApiKey: "${DT_API_TOKEN}",
                     dependencyTrackFrontendUrl: "${DT_API_URL}",
-                    dependencyTrackUrl: "http://localhost:9091/api",
+                    dependencyTrackUrl: "http://localhost:9091/api/v1/projects",
                     projectName: "monorepo-app",
                     projectVersion: "1.0.0",
                     synchronous: true
