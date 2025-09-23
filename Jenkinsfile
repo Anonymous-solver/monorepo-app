@@ -55,7 +55,7 @@ pipeline {
                     dependencyTrackFrontendUrl: "${DT_API_URL}",
                     dependencyTrackUrl: "http://localhost:9091/api",
                     projectName: "monorepo-app",
-                    projectVersion: "1.0.${BUILD_NUMBER}",
+                    projectVersion: "1.0.0",   // keep consistent with UI until confirmed
                     synchronous: true
                 )
             }
