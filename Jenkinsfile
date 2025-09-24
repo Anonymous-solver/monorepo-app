@@ -45,7 +45,7 @@ pipeline {
                 }
             }
         }
-
+        
         stage('Upload SBOM to Dependency-Track') {
             steps {
                 script {
@@ -53,21 +53,21 @@ pipeline {
                     sh '''
                         RESPONSE=$(curl -s -o /tmp/dt_project.json -w "%{http_code}" \
                         -H "X-Api-Key: ${DT_API_TOKEN}" \
-                        "http://localhost:9091/api/v1/projects?name=monorepo-app&version=1.0.0")
+                        "http://localhost:9091/api/v1/project?name=monorepo-app&version=1.0.0")
 
                         if grep -q '"uuid"' /tmp/dt_project.json; then
-                            echo "✅ Project already exists"
+                        echo "✅ Project already exists"
                         else
-                            echo "⚡ Project not found. Creating..."
-                            curl -s -X PUT \
-                                -H "X-Api-Key: ${DT_API_TOKEN}" \
-                                -H "Content-Type: application/json" \
-                                http://localhost:9091/api/v1/project \
-                                -d '{
-                                    "name": "monorepo-app",
-                                    "version": "1.0.0",
-                                    "classifier": "APPLICATION"
-                                }'
+                        echo "⚡ Project not found. Creating..."
+                        curl -s -X PUT \
+                            -H "X-Api-Key: ${DT_API_TOKEN}" \
+                            -H "Content-Type: application/json" \
+                            http://localhost:9091/api/v1/project \
+                            -d '{
+                                "name": "monorepo-app",
+                                "version": "1.0.0",
+                                "classifier": "APPLICATION"
+                            }'
                         fi
                     '''
                 }
@@ -77,7 +77,7 @@ pipeline {
                     autoCreateProjects: true,
                     dependencyTrackApiKey: "${DT_API_TOKEN}",
                     dependencyTrackFrontendUrl: "${DT_API_URL}",
-                    dependencyTrackUrl: "http://localhost:9091/api",   // ✅ fixed
+                    dependencyTrackUrl: "http://localhost:9091/api",
                     projectName: "monorepo-app",
                     projectVersion: "1.0.0",
                     synchronous: true
