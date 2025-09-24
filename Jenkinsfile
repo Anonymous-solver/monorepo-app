@@ -31,35 +31,35 @@ pipeline {
             }
         }
 
-        // stage('Generate SBOM') {
-        //     steps {
-        //         script {
-        //             sh '''
-        //                 git config --global --add safe.directory $(pwd)
+        stage('Generate SBOM') {
+            steps {
+                script {
+                    sh '''
+                        git config --global --add safe.directory $(pwd)
  
-        //                 npm install --save-dev @cyclonedx/bom
-        //                 npx cyclonedx-bom -o sbom.json
+                        npm install --save-dev @cyclonedx/bom
+                        npx cyclonedx-bom -o sbom.json
  
-        //                 ls -la sbom.json
-        //             '''
-        //         }
-        //     }
-        // }
+                        ls -la sbom.json
+                    '''
+                }
+            }
+        }
 
-        // stage('Upload SBOM to Dependency-Track') {
-        //     steps {
-        //         dependencyTrackPublisher(
-        //             artifact: 'sbom.json',
-        //             autoCreateProjects: true,
-        //             dependencyTrackApiKey: "${DT_API_TOKEN}",
-        //             dependencyTrackFrontendUrl: "${DT_API_URL}",
-        //             dependencyTrackUrl: "http://localhost:9091/api",
-        //             projectName: "monorepo-app",
-        //             projectVersion: "1.0.0",   // keep consistent with UI until confirmed
-        //             synchronous: true
-        //         )
-        //     }
-        // }
+        stage('Upload SBOM to Dependency-Track') {
+            steps {
+                dependencyTrackPublisher(
+                    artifact: 'sbom.json',
+                    autoCreateProjects: true,
+                    dependencyTrackApiKey: "${DT_API_TOKEN}",
+                    dependencyTrackFrontendUrl: "${DT_API_URL}",
+                    dependencyTrackUrl: "http://localhost:9091/api",
+                    projectName: "monorepo-app",
+                    projectVersion: "1.0.0",   // keep consistent with UI until confirmed
+                    synchronous: true
+                )
+            }
+        }
         
         stage('Build Docker Image') {
             steps {
