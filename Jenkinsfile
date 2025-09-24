@@ -82,12 +82,21 @@ pipeline {
 
                     echo "✅ Using Dependency-Track project UUID: ${projectUuid}"
 
+                    // dependencyTrackPublisher(
+                    //     artifact: 'sbom.json',
+                    //     dependencyTrackApiKey: "${DT_API_TOKEN}",
+                    //     dependencyTrackFrontendUrl: "${DT_API_URL}",
+                    //     dependencyTrackUrl: "http://localhost:9091/api",
+                    //     projectId: "${projectUuid}",   // 🔑 Use UUID instead of name/version
+                    //     synchronous: true
+                    // )
+
                     dependencyTrackPublisher(
                         artifact: 'sbom.json',
                         dependencyTrackApiKey: "${DT_API_TOKEN}",
                         dependencyTrackFrontendUrl: "${DT_API_URL}",
-                        dependencyTrackUrl: "http://localhost:9091/api",
-                        projectId: "${projectUuid}",   // 🔑 Use UUID instead of name/version
+                        dependencyTrackUrl: "http://localhost:9091",
+                        projectId: "${projectUuid}",   // ✅ only UUID
                         synchronous: true
                     )
                 }
