@@ -1,0 +1,19 @@
+name: Develop Workflow
+on: 
+  push:
+    branches:
+      - develop
+      - main
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run security scan
+        run: echo "Running security scan..."
+
+      - name: docker build
+        run: |
+          docker build -t my-app:latest .
