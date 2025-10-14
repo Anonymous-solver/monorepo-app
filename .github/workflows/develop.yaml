@@ -14,6 +14,25 @@ jobs:
       - name: Run security scan
         run: echo "Running security scan..."
 
-      - name: docker build
-        run: |
-          docker build -t my-app:latest .
+  build:
+
+    runs-on: ubuntu-latest
+    environment: develop
+    needs: [scan]
+
+    steps:
+        - name: Checkout
+          uses: actions/checkout@v5
+
+        - name: docker build
+          run: |
+              docker build -t my-app:latest .
+        
+        - name: docker login
+          run: |
+            echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+
+        - name: docker push
+          run: |
+            docker tag my-app:latest anikb29/monorepo-app/my-app:latest
+            docker push anikb29/monorepo-app/my-app:latest
