@@ -49,44 +49,44 @@ pipeline {
         stage('Upload SBOM to Dependency-Track') {
             steps {
                 script {
-                echo "🔎 Ensuring Dependency-Track project exists..." 
-                sh ''' RESPONSE=$(curl -s -o /tmp/dt_project.json -w "%{http_code}" \ 
-                -H "X-Api-Key: ${DT_API_TOKEN}" \ "http://localhost:9091/api/v1/project?name=monorepo-app&version=1.0.0")
+                    echo "🔎 Ensuring Dependency-Track project exists..." 
+                    sh ''' RESPONSE=$(curl -s -o /tmp/dt_project.json -w "%{http_code}" \ 
+                    -H "X-Api-Key: ${DT_API_TOKEN}" \ "http://localhost:9091/api/v1/project?name=monorepo-app&version=1.0.0")
 
-                if grep -q '"uuid"' /tmp/dt_project.json; then 
-                echo "✅ Project already exists" 
-                else 
-                echo "⚡ Project not found. Creating..." 
-                curl -s -X PUT \ 
-                    -H "X-Api-Key: ${DT_API_TOKEN}" \ 
-                    -H "Content-Type: application/json" \ 
-                    http://localhost:9091/api/v1/project \ 
-                    -d '{ 
-                        "name": "monorepo-app", 
-                        "version": "1.0.0", 
-                        "classifier": "APPLICATION" 
-                    }' > /tmp/dt_project.json 
-                    fi 
-                        echo "📄 Project JSON:" 
-                        cat /tmp/dt_project.json 
-                    '''
+                    if grep -q '"uuid"' /tmp/dt_project.json; then 
+                    echo "✅ Project already exists" 
+                    else 
+                    echo "⚡ Project not found. Creating..." 
+                    curl -s -X PUT \ 
+                        -H "X-Api-Key: ${DT_API_TOKEN}" \ 
+                        -H "Content-Type: application/json" \ 
+                        http://localhost:9091/api/v1/project \ 
+                        -d '{ 
+                            "name": "monorepo-app", 
+                            "version": "1.0.0", 
+                            "classifier": "APPLICATION" 
+                        }' > /tmp/dt_project.json 
+                        fi 
+                            echo "📄 Project JSON:" 
+                            cat /tmp/dt_project.json 
+                        '''
 
-                // extract UUID without jq (grep/sed) 
-                def projectUuid = sh( 
-                    script: "grep -o '\"uuid\":\"[a-f0-9-]*\"' /tmp/dt_project.json | head -1 | cut -d '\"' -f4", 
-                    returnStdout: true 
-                    ).trim()
+                    // extract UUID without jq (grep/sed) 
+                    def projectUuid = sh( 
+                        script: "grep -o '\"uuid\":\"[a-f0-9-]*\"' /tmp/dt_project.json | head -1 | cut -d '\"' -f4", 
+                        returnStdout: true 
+                        ).trim()
 
-                echo "✅ Using Dependency-Track project UUID: ${projectUuid}"
+                    echo "✅ Using Dependency-Track project UUID: ${projectUuid}"
 
-                dependencyTrackPublisher(
-                    artifact: 'sbom.json',
-                    dependencyTrackApiKey: "${DT_API_TOKEN}",
-                    dependencyTrackFrontendUrl: "${DT_API_URL}",
-                    dependencyTrackUrl: "http://localhost:9091",
-                    projectId: "${projectUuid}",
-                    synchronous: true
-                )
+                    dependencyTrackPublisher(
+                        artifact: 'sbom.json',
+                        dependencyTrackApiKey: "${DT_API_TOKEN}",
+                        dependencyTrackFrontendUrl: "${DT_API_URL}",
+                        dependencyTrackUrl: "http://localhost:9091",
+                        projectId: "${projectUuid}",
+                        synchronous: true
+                    )
                 }
             }
         }
