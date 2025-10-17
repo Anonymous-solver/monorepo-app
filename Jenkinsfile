@@ -49,48 +49,49 @@ pipeline {
         stage('Upload SBOM to Dependency-Track') {
             steps {
                 script {
-                    echo "🔎 Ensuring Dependency-Track project exists..."
-                    sh '''
-                        RESPONSE=$(curl -s -o /tmp/dt_project.json -w "%{http_code}" \
+                echo "🔎 Ensuring Dependency-Track project exists..."
+
+                sh '''
+                    RESPONSE=$(curl -s -o /tmp/dt_project.json -w "%{http_code}" \
+                    -H "X-Api-Key: ${DT_API_TOKEN}" \
+                    "http://localhost:9091/api/v1/project?name=monorepo-app&version=1.0.0")
+
+                    if grep -q '"uuid"' /tmp/dt_project.json; then
+                    echo "✅ Project already exists"
+                    else
+                    echo "⚡ Project not found. Creating..."
+                    curl -s -X PUT \
                         -H "X-Api-Key: ${DT_API_TOKEN}" \
-                        "http://localhost:9091/api/v1/project?name=monorepo-app&version=1.0.0")
+                        -H "Content-Type: application/json" \
+                        -d '{"name": "monorepo-app", "version": "1.0.0", "classifier": "APPLICATION"}' \
+                        http://localhost:9091/api/v1/project \
+                        -o /tmp/dt_project.json
+                    fi
 
-                        if grep -q '"uuid"' /tmp/dt_project.json; then
-                        echo "✅ Project already exists"
-                        else
-                        echo "⚡ Project not found. Creating..."
-                        curl -s -X PUT \
-                            -H "X-Api-Key: ${DT_API_TOKEN}" \
-                            -H "Content-Type: application/json" \
-                            http://localhost:9091/api/v1/project \
-                            -d '{
-                                "name": "monorepo-app",
-                                "version": "1.0.0",
-                                "classifier": "APPLICATION"
-                            }' > /tmp/dt_project.json
-                        fi
+                    echo "📄 Project JSON:"
+                    cat /tmp/dt_project.json
+                '''
 
-                        echo "📄 Project JSON:"
-                        cat /tmp/dt_project.json
-                    '''
+                // ✅ Extract UUID whether project existed or was newly created
+                def projectUuid = sh(
+                    script: "grep -o '\"uuid\":\"[a-f0-9-]*\"' /tmp/dt_project.json | head -1 | cut -d '\"' -f4 || true",
+                    returnStdout: true
+                ).trim()
 
-                    // extract UUID without jq (grep/sed)
-                    def projectUuid = sh(
-                        script: "grep -o '\"uuid\":\"[a-f0-9-]*\"' /tmp/dt_project.json | head -1 | cut -d '\"' -f4",
-                        returnStdout: true
-                    ).trim()
+                if (!projectUuid) {
+                    error "❌ Failed to extract project UUID from /tmp/dt_project.json"
+                }
 
-                    echo "✅ Using Dependency-Track project UUID: ${projectUuid}"
+                echo "✅ Using Dependency-Track project UUID: ${projectUuid}"
 
-
-                    dependencyTrackPublisher(
-                        artifact: 'sbom.json',
-                        dependencyTrackApiKey: "${DT_API_TOKEN}",
-                        dependencyTrackFrontendUrl: "${DT_API_URL}",
-                        dependencyTrackUrl: "http://localhost:9091",
-                        projectId: "${projectUuid}",   // ✅ only UUID
-                        synchronous: true
-                    )
+                dependencyTrackPublisher(
+                    artifact: 'sbom.json',
+                    dependencyTrackApiKey: "${DT_API_TOKEN}",
+                    dependencyTrackFrontendUrl: "${DT_API_URL}",
+                    dependencyTrackUrl: "http://localhost:9091",
+                    projectId: "${projectUuid}",
+                    synchronous: true
+                )
                 }
             }
         }
