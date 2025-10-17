@@ -50,5 +50,12 @@ CMD ["node", "server/server.js"]
 #     dependencytrack/frontend
 
 # dependency track: admin/admin123
-# odt_W17FM3P5_r6feD519ruL9iX5BJZrdg5pWp2p8xgrv
+# odt_PpnCJGh5_860dzFYo56mG1bHHKLTkDxtaVos6ywAA
 
+# Permissions needed:
+
+# BOM_UPLOAD
+# PORTFOLIO_VIEW
+# FINDING_VIEW
+# VULNERABILITY_ANALYSIS
+# METRICS_VIEW
