@@ -51,9 +51,11 @@ pipeline {
                 script {
                     echo "🔎 Ensuring Dependency-Track project exists..."
                     sh '''
-                        RESPONSE=$(curl -s -o /tmp/dt_project.json -w "%{http_code}" \
-                        -H "X-Api-Key: ${DT_API_TOKEN}" \
-                        "http://localhost:9091/api/v1/project?name=monorepo-app&version=1.0.0")
+                        set -e
+                        echo "➡ Checking if project exists..."
+                        HTTP_CODE=$(curl -s -o /tmp/dt_project.json -w "%{http_code}" \
+                            -H "X-Api-Key: ${DT_API_TOKEN}" \
+                            "http://localhost:9091/api/v1/project?name=monorepo-app&version=1.0.0")
 
                         if grep -q '"uuid"' /tmp/dt_project.json; then
                             echo "✅ Project already exists"
@@ -62,26 +64,29 @@ pipeline {
                             curl -s -X PUT \
                                 -H "X-Api-Key: ${DT_API_TOKEN}" \
                                 -H "Content-Type: application/json" \
-                                http://localhost:9091/api/v1/project \
                                 -d '{
                                     "name": "monorepo-app",
                                     "version": "1.0.0",
                                     "classifier": "APPLICATION"
-                                }' > /tmp/dt_project.json
+                                }' \
+                                http://localhost:9091/api/v1/project > /tmp/dt_project.json
                         fi
 
                         echo "📄 Project JSON:"
                         cat /tmp/dt_project.json
                     '''
 
-                    // extract UUID without jq (grep/sed)
+                    // ✅ Robust UUID extraction — ignores whitespace and validates format
                     def projectUuid = sh(
-                        script: "grep -o '\"uuid\":\"[a-f0-9-]*\"' /tmp/dt_project.json | head -1 | cut -d '\"' -f4",
+                        script: '''
+                            grep -o '"uuid":"[a-f0-9-]*"' /tmp/dt_project.json | \
+                            head -1 | cut -d '"' -f4 | tr -d '[:space:]'
+                        ''',
                         returnStdout: true
                     ).trim()
 
                     if (!projectUuid) {
-                        error "❌ Failed to extract project UUID from /tmp/dt_project.json"
+                        error("❌ Failed to extract project UUID from /tmp/dt_project.json")
                     }
 
                     echo "✅ Using Dependency-Track project UUID: ${projectUuid}"
@@ -92,12 +97,11 @@ pipeline {
                         dependencyTrackFrontendUrl: "${DT_API_URL}",
                         dependencyTrackUrl: "http://localhost:9091",
                         projectId: "${projectUuid}",
-                        synchronous: false
+                        synchronous: true
                     )
                 }
             }
         }
-
 
         stage('Build Docker Image') {
             steps {
