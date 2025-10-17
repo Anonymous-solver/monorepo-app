@@ -49,43 +49,33 @@ pipeline {
         stage('Upload SBOM to Dependency-Track') {
             steps {
                 script {
-                echo "🔎 Ensuring Dependency-Track project exists..."
+                echo "🔎 Ensuring Dependency-Track project exists..." 
+                sh ''' RESPONSE=$(curl -s -o /tmp/dt_project.json -w "%{http_code}" \ 
+                -H "X-Api-Key: ${DT_API_TOKEN}" \ "http://localhost:9091/api/v1/project?name=monorepo-app&version=1.0.0")
 
-                sh '''
-                    RESPONSE=$(curl -s -o /tmp/dt_project.json -w "%{http_code}" \
-                    -H "X-Api-Key: ${DT_API_TOKEN}" \
-                    "http://localhost:9091/api/v1/project?name=monorepo-app&version=1.0.0")
+                if grep -q '"uuid"' /tmp/dt_project.json; then 
+                echo "✅ Project already exists" 
+                else 
+                echo "⚡ Project not found. Creating..." 
+                curl -s -X PUT \ 
+                    -H "X-Api-Key: ${DT_API_TOKEN}" \ 
+                    -H "Content-Type: application/json" \ 
+                    http://localhost:9091/api/v1/project \ 
+                    -d '{ 
+                        "name": "monorepo-app", 
+                        "version": "1.0.0", 
+                        "classifier": "APPLICATION" 
+                    }' > /tmp/dt_project.json 
+                    fi 
+                        echo "📄 Project JSON:" 
+                        cat /tmp/dt_project.json 
+                    '''
 
-                    echo "🔹 HTTP Response Code: $RESPONSE"
-                    echo "📄 /tmp/dt_project.json content (before creation check):"
-                    cat /tmp/dt_project.json
-
-                    if grep -q '"uuid"' /tmp/dt_project.json; then
-                    echo "✅ Project already exists"
-                    else
-                    echo "⚡ Project not found. Creating..."
-                    curl -s -X PUT \
-                        -H "X-Api-Key: ${DT_API_TOKEN}" \
-                        -H "Content-Type: application/json" \
-                        -d '{"name": "monorepo-app", "version": "1.0.0", "classifier": "APPLICATION"}' \
-                        http://localhost:9091/api/v1/project \
-                        -o /tmp/dt_project.json
-                    fi
-
-                    echo "📄 /tmp/dt_project.json content (after check or creation):"
-                    cat /tmp/dt_project.json
-                '''
-
-                def projectUuid = sh(
-                    script: "grep -o '\"uuid\":\"[a-f0-9-]*\"' /tmp/dt_project.json | head -1 | cut -d '\"' -f4 || true",
-                    returnStdout: true
-                ).trim()
-
-                echo "🧾 Extracted project UUID: ${projectUuid}"
-
-                if (!projectUuid) {
-                    error "❌ Failed to extract project UUID from /tmp/dt_project.json"
-                }
+                // extract UUID without jq (grep/sed) 
+                def projectUuid = sh( 
+                    script: "grep -o '\"uuid\":\"[a-f0-9-]*\"' /tmp/dt_project.json | head -1 | cut -d '\"' -f4", 
+                    returnStdout: true 
+                    ).trim()
 
                 echo "✅ Using Dependency-Track project UUID: ${projectUuid}"
 
