@@ -2,7 +2,7 @@ pipeline {
     agent any
    
     environment {
-        DT_API_TOKEN = "odt_W17FM3P5_r6feD519ruL9iX5BJZrdg5pWp2p8xgrv"
+        DT_API_TOKEN = "odt_PpnCJGh5_860dzFYo56mG1bHHKLTkDxtaVos6ywAA"
         DT_API_URL = "http://localhost:9090"
         DOCKER_IMAGE = "anikb29/monorepo-app"
         BUILD_NUMBER = "101"
