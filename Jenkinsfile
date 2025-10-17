@@ -92,7 +92,7 @@ pipeline {
                         dependencyTrackFrontendUrl: "${DT_API_URL}",
                         dependencyTrackUrl: "http://localhost:9091",
                         projectId: "${projectUuid}",
-                        synchronous: true
+                        synchronous: false
                     )
                 }
             }
