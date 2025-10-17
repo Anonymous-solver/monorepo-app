@@ -56,6 +56,10 @@ pipeline {
                     -H "X-Api-Key: ${DT_API_TOKEN}" \
                     "http://localhost:9091/api/v1/project?name=monorepo-app&version=1.0.0")
 
+                    echo "🔹 HTTP Response Code: $RESPONSE"
+                    echo "📄 /tmp/dt_project.json content (before creation check):"
+                    cat /tmp/dt_project.json
+
                     if grep -q '"uuid"' /tmp/dt_project.json; then
                     echo "✅ Project already exists"
                     else
@@ -68,15 +72,16 @@ pipeline {
                         -o /tmp/dt_project.json
                     fi
 
-                    echo "📄 Project JSON:"
+                    echo "📄 /tmp/dt_project.json content (after check or creation):"
                     cat /tmp/dt_project.json
                 '''
 
-                // ✅ Extract UUID whether project existed or was newly created
                 def projectUuid = sh(
                     script: "grep -o '\"uuid\":\"[a-f0-9-]*\"' /tmp/dt_project.json | head -1 | cut -d '\"' -f4 || true",
                     returnStdout: true
                 ).trim()
+
+                echo "🧾 Extracted project UUID: ${projectUuid}"
 
                 if (!projectUuid) {
                     error "❌ Failed to extract project UUID from /tmp/dt_project.json"
@@ -95,6 +100,7 @@ pipeline {
                 }
             }
         }
+
 
         stage('Build Docker Image') {
             steps {
