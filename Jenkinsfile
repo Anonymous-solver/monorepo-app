@@ -132,15 +132,31 @@ pipeline {
                 withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key', keyFileVariable: 'SSH_KEY')]) {
                     sh '''
                         ssh -i $SSH_KEY -o StrictHostKeyChecking=no ec2-user@ec2-44-221-45-198.compute-1.amazonaws.com "
+                            if ! command -v docker &> /dev/null; then
+                                sudo yum update -y &&
+                                sudo yum install -y docker &&
+                                sudo systemctl enable docker &&
+                                sudo systemctl start docker &&
+                                sudo usermod -aG docker ec2-user
+                            fi &&
                             docker stop monorepo-app || true &&
                             docker rm monorepo-app || true &&
                             docker pull anikb29/monorepo-app:latest &&
                             docker run -d --name monorepo-app -p 4000:4000 anikb29/monorepo-app:latest
                         "
                     '''
+
+                    
+                    
                 }
             }
         }
     }
 }
 
+// ssh -i $SSH_KEY -o StrictHostKeyChecking=no ec2-user@ec2-44-221-45-198.compute-1.amazonaws.com "
+//     docker stop monorepo-app || true &&
+//     docker rm monorepo-app || true &&
+//     docker pull anikb29/monorepo-app:latest &&
+//     docker run -d --name monorepo-app -p 4000:4000 anikb29/monorepo-app:latest
+// "
