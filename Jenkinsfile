@@ -120,23 +120,23 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
-            steps {
-                sh 'docker stop monorepo-app || true && docker rm monorepo-app || true'
-                sh "docker run -d --name monorepo-app -p 4000:4000 ${DOCKER_IMAGE}:latest"
-            }
-        }
+        // stage('Deploy') {
+        //     steps {
+        //         sh 'docker stop monorepo-app || true && docker rm monorepo-app || true'
+        //         sh "docker run -d --name monorepo-app -p 4000:4000 ${DOCKER_IMAGE}:latest"
+        //     }
+        // }
 
         stage('Deploy to EC2') {
             steps {
-                sshagent(['ec2-ssh-key']) {
+                withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key', keyFileVariable: 'SSH_KEY')]) {
                     sh '''
-                        ssh -o StrictHostKeyChecking=no ec2-user@ec2-44-221-45-198.compute-1.amazonaws.com'
+                        ssh -i $SSH_KEY -o StrictHostKeyChecking=no ec2-user@ec2-44-221-45-198.compute-1.amazonaws.com "
                             docker stop monorepo-app || true &&
                             docker rm monorepo-app || true &&
                             docker pull anikb29/monorepo-app:latest &&
                             docker run -d --name monorepo-app -p 4000:4000 anikb29/monorepo-app:latest
-                        '
+                        "
                     '''
                 }
             }
