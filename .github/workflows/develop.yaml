@@ -34,4 +34,3 @@ jobs:
             sudo docker rm monorepo-app || true
             sudo docker pull anikb29/monorepo-app:latest
             sudo docker run -d --name monorepo-app -p 4000:4000 anikb29/monorepo-app:latest
-
