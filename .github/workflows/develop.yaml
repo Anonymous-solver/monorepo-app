@@ -30,7 +30,8 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            docker stop monorepo-app || true
-            docker rm monorepo-app || true
-            docker pull ${{ secrets.DOCKER_USERNAME }}/monorepo-app:latest
-            docker run -d --name monorepo-app -p 4000:4000 ${{ secrets.DOCKER_USERNAME }}/monorepo-app:latest
+            sudo docker stop monorepo-app || true
+            sudo docker rm monorepo-app || true
+            sudo docker pull anikb29/monorepo-app:latest
+            sudo docker run -d --name monorepo-app -p 4000:4000 anikb29/monorepo-app:latest
+
